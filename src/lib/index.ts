@@ -25,8 +25,7 @@
 import axios from 'axios';
 
 class GeoLib {
-    async getAddressFromCoordinates(coordinates: any) {
-        console.log("Teste 1 ===>>", coordinates)
+    async getAddressFromCoordinates(coordinates: number[]) {
         try {
             let response;
             if (Array.isArray(coordinates)) {
@@ -36,7 +35,6 @@ class GeoLib {
                         'Access-Control-Allow-Origin': '*'
                     }
                 });
-                console.log("Teste 3 ===>>", response?.data)
             } else {
                 throw new Error('Invalid coordinates format');
             }
@@ -51,9 +49,14 @@ class GeoLib {
         }
     }
 
-    async getCoordinatesFromAddress(address: any) {
+    async getCoordinatesFromAddress(address: string) {
         try {
-            const response = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+            const response = await axios.get(`https://nominatim.openstreetmap.org/search?addressdetails=1&q=${encodeURIComponent(address)}&format=jsonv2&limit=1`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                }
+            });
 
             if (Array.isArray(response.data) && response.data.length > 0) {
                 const { lat, lon } = response.data[0];
