@@ -26,11 +26,11 @@ const UserSchema: Schema<IUser> = new Schema<IUser>({
     regions: [{ type: Schema.Types.ObjectId, ref: 'Region' }]
 });
 
-const RegionSchema: Schema<IRegion> = new Schema<IRegion>({
-    _id: { type: String, required: true, default: () => new ObjectId().toString() },
-    name: { type: String, required: true },
-    user: { type: String, ref: 'User', required: true }
-});
+// const RegionSchema: Schema<IRegion> = new Schema<IRegion>({
+//     _id: { type: String, required: true, default: () => new ObjectId().toString() },
+//     name: { type: String, required: true },
+//     user: { type: String, ref: 'User', required: true }
+// });
 
 // UserSchema.pre<IUser>('save', async function (next) {
 
@@ -45,8 +45,7 @@ const RegionSchema: Schema<IRegion> = new Schema<IRegion>({
 //     next();
 // });
 
-const UserModel: Model<IUser> = model<IUser>('User', UserSchema);
-const RegionModel: Model<IRegion> = model<IRegion>('Region', RegionSchema);
+export const UserModel: Model<IUser> = model<IUser>('User', UserSchema);
+// const RegionModel: Model<IRegion> = model<IRegion>('Region', RegionSchema);
 
-export { RegionModel, UserModel };
 
