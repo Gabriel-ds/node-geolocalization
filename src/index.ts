@@ -10,6 +10,6 @@ app.use('/users', userRoutes);
 app.use('/regions', regionRoutes);
 
 app.listen(3000, () => {
-    mongoose.connect('mongodb+srv://admin:admin@api-teste.hj5yyiq.mongodb.net/?retryWrites=true&w=majority&appName=api-teste')
+    mongoose.connect('mongodb://admin:admin@localhost:27018/?retryWrites=true&w=majority')
     console.log("RODANDOO")
 });
