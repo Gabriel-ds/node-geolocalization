@@ -1,21 +1,13 @@
 import { Request, Response } from 'express';
 import { RegionModel } from '../models/regionModel';
+import regionService from '../services/regionService';
 import { STATUS } from '../utils/httpStatus';
 
 class RegionController {
     async createRegion(req: Request, res: Response) {
         try {
             const { name, coordinates, userId } = req.body;
-
-            if (!userId) {
-                return res.status(STATUS.BAD_REQUEST).json({ message: 'User not found' });
-            }
-
-            const newRegion = new RegionModel({
-                name,
-                coordinates,
-                userId
-            });
+            const newRegion = await regionService.createRegion({ name, coordinates, userId })
 
             await newRegion.save();
 
@@ -103,6 +95,31 @@ class RegionController {
         } catch (error: any) {
             console.error('Error deleting region:', error);
             res.status(500).json({ error: 'Error deleting region' });
+        }
+    }
+
+    async getRegionsByCoordinates(req: Request, res: Response) {
+        const { lat, long } = req.body;
+
+        try {
+            if (!lat || !long) {
+                return res.status(STATUS.BAD_REQUEST).json({ message: 'Latitude and longitude are required' });
+            }
+
+            const coordinates = [parseFloat(long as string), parseFloat(lat as string)];
+
+            console.log("coordinates ===>>", coordinates)
+
+            const regions = await RegionModel.find({
+                coordinates: {
+                    $eq: coordinates
+                }
+            }).lean();
+
+            res.json(regions);
+        } catch (error) {
+            console.error('Error fetching regions by coordinates:', error);
+            res.status(STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching regions by coordinates' });
         }
     }
 }

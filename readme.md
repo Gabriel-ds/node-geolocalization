@@ -8,6 +8,6 @@
 
 ##Regiões
 [X] CRUD completo para regiões.
-[] Cada região tem um nome, coordenadas e um usuário que será o dono da região.
-[] Listar regiões contendo um ponto específico.
+[x] Cada região tem um nome, coordenadas e um usuário que será o dono da região.
+[x] Listar regiões contendo um ponto específico.
 [] Listar regiões a uma certa distância de um ponto, com opção de filtrar regiões não pertencentes ao usuário que fez a requisição.

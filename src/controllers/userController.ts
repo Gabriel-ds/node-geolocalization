@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { UserModel } from '../models/user';
-import { resolveCoordinatesAndAddress } from '../services/userService';
+import UserService from '../services/userService';
 import { STATUS } from '../utils/httpStatus';
 
 class UserController {
     async createUser(req: Request, res: Response) {
         try {
             const { name, email, address, coordinates } = req.body;
-            const result = await resolveCoordinatesAndAddress(address, coordinates);
+            const result = await UserService.resolveCoordinatesAndAddress(address, coordinates);
             if (result.error) {
                 return res.status(STATUS.BAD_REQUEST).json({ error: result.error });
             }
@@ -71,7 +71,7 @@ class UserController {
             const { id } = req.params;
             const { name, email, address, coordinates } = req.body;
 
-            const result = await resolveCoordinatesAndAddress(address, coordinates);
+            const result = await UserService.resolveCoordinatesAndAddress(address, coordinates);
             if (result.error) {
                 return res.status(STATUS.BAD_REQUEST).json({ error: result.error });
             }
