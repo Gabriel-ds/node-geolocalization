@@ -1,117 +1,12 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import mongoose from 'mongoose';
-import { UserModel } from './models/user';
-import { resolveCoordinatesAndAddress } from './services/userService';
-import { STATUS } from './utils/httpStatus';
+import userRoutes from './routes/userRoutes';
 
 const app = express();
 
 app.use(express.json());
+app.use('/users', userRoutes);
 
-app.post('/user', async (req, res) => {
-    try {
-        const { name, email, address, coordinates } = req.body;
-        // const { userCoordinates, userAddress } = await resolveCoordinatesAndAddress(address, coordinates)
-        const result = await resolveCoordinatesAndAddress(address, coordinates);
-        if (result.error) {
-            return res.status(STATUS.BAD_REQUEST).json({ error: result.error });
-        }
-        const { userCoordinates, userAddress } = result;
-
-        const newUser = new UserModel({
-            name,
-            email,
-            address: userAddress,
-            coordinates: userCoordinates,
-            regions: []
-        });
-        await newUser.save();
-        res.send(newUser)
-    } catch (error: any) {
-        console.log(error)
-        res.status(500).send({ message: error.message });
-    }
-})
-
-app.get('/users', async (req: Request, res: Response) => {
-    const { page, limit } = req.query;
-
-    try {
-        const [users, total] = await Promise.all([
-            UserModel.find().lean(),
-            UserModel.countDocuments(),
-        ]);
-
-        res.json({
-            rows: users,
-            page,
-            limit,
-            total,
-        });
-    } catch (error) {
-        console.error('Error fetching users:', error);
-        res.status(STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching users' });
-    }
-});
-
-app.get('/user/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-
-    try {
-        const user = await UserModel.findOne({ _id: id }).lean();
-
-        if (!user) {
-            return res.status(STATUS.NOT_FOUND).json({ message: 'User not found' });
-        }
-
-        res.json(user);
-    } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching user' });
-    }
-});
-
-app.put('/user/:id', async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const { name, email, address, coordinates } = req.body;
-
-        // const { userCoordinates, userAddress } = await resolveCoordinatesAndAddress(address, coordinates)
-        const result = await resolveCoordinatesAndAddress(address, coordinates);
-        if (result.error) {
-            return res.status(STATUS.BAD_REQUEST).json({ error: result.error });
-        }
-        const { userCoordinates, userAddress } = result;
-
-        const user = await UserModel.findOneAndUpdate(
-            { _id: id },
-            { name, email, address: userAddress, coordinates: userCoordinates },
-            { new: true }
-        );
-
-        if (!user) {
-            return res.status(STATUS.NOT_FOUND).json({ message: 'User not found' });
-        }
-
-        res.status(STATUS.UPDATED).json(user);
-    } catch (error: any) {
-        console.error('Error updating user:', error);
-        res.status(500).send({ message: error.message });
-    }
-});
-
-app.delete('/user/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-    try {
-        const user = await UserModel.findByIdAndDelete(id)
-        if (!user) return res.status(STATUS.NOT_FOUND).send({ message: "User not found" })
-        res.send(user)
-    } catch (error) {
-        res.status(STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Error deleting user' })
-    }
-})
-
-// Connect to MongoDB
 app.listen(3000, () => {
     mongoose.connect('mongodb+srv://admin:admin@api-teste.hj5yyiq.mongodb.net/?retryWrites=true&w=majority&appName=api-teste')
     console.log("RODANDOO")
