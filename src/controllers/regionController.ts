@@ -6,7 +6,6 @@ class RegionController {
     async createRegion(req: Request, res: Response) {
         try {
             const { name, coordinates, userId } = req.body;
-            console.log('======>>> ', { name, coordinates, userId })
 
             if (!userId) {
                 return res.status(STATUS.BAD_REQUEST).json({ message: 'User not found' });
@@ -27,10 +26,52 @@ class RegionController {
         }
     }
 
+    async listRegions(req: Request, res: Response) {
+        const { page, limit } = req.query;
+
+        try {
+            const [regions, total] = await Promise.all([
+                RegionModel.find().lean(),
+                RegionModel.countDocuments(),
+            ]);
+
+            res.json({
+                rows: regions,
+                page,
+                limit,
+                total,
+            });
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            res.status(STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching regions' });
+        }
+    }
+
+    async findRegionById(req: Request, res: Response) {
+        const { id } = req.params;
+
+        try {
+            const region = await RegionModel.findOne({ _id: id }).lean();
+
+            if (!region) {
+                return res.status(STATUS.NOT_FOUND).json({ message: 'region not found' });
+            }
+
+            res.json(region);
+        } catch (error) {
+            console.error('Error fetching region:', error);
+            res.status(STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching region' });
+        }
+    }
+
     async updateRegion(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const { name, coordinates } = req.body;
+            const { name, coordinates, userId } = req.body;
+
+            if (!userId) {
+                return res.status(STATUS.BAD_REQUEST).json({ message: 'User not found' });
+            }
 
             const updatedRegion = await RegionModel.findByIdAndUpdate(id, {
                 name,

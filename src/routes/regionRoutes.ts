@@ -4,9 +4,9 @@ import RegionController from '../controllers/regionController';
 const regionRouter = express.Router();
 
 regionRouter.post('/', RegionController.createRegion);
-// router.get('/', UserController.getUsers);
-// router.get('/:id', UserController.getUser);
-// router.put('/:id', UserController.updateUser);
-// router.delete('/:id', UserController.deleteUser);
+regionRouter.get('/', RegionController.listRegions);
+regionRouter.get('/:id', RegionController.findRegionById);
+regionRouter.put('/:id', RegionController.updateRegion);
+regionRouter.delete('/:id', RegionController.deleteRegion);
 
 export default regionRouter;
